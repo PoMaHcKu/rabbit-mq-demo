@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  receiver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: 
+      - "80:8080"
+    container_name: receiver
+    depends_on:
+      - rabbit
+    restart: on-failure
+  rabbit:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbit
+  sender:
+    build: ./rabbit-client
+    ports:
+      - "8080:8080"
+    container_name: sender
+    depends_on:
+      - rabbit
+    restart: on-failure
