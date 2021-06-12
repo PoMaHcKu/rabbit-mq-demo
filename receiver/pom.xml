@@ -7,21 +7,17 @@
         <artifactId>rabbit-demo</artifactId>
         <version>1</version>
     </parent>
-    <groupId>com.rabbit.config</groupId>
-    <artifactId>config</artifactId>
+    <artifactId>receiver</artifactId>
     <version>${project.version}</version>
-    <name>config</name>
+    <name>receiver</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>com.rabbit.config</groupId>
+            <artifactId>config</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

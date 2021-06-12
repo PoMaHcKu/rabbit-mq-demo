@@ -1,9 +1,10 @@
-package com.example.demo;
+package com.rabbit.sender;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,23 +14,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 @SpringBootApplication
-public class DemoApplication {
+public class RabbitReceiver {
+
+    @Autowired
+    private ConnectionFactory factory;
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(RabbitReceiver.class, args);
     }
 
     @Bean
-    public ConnectionFactory connectionFactory() throws Exception {
-        final String QUEUE_NAME = "http_get";
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("rabbit");
-        factory.setShutdownTimeout(100);
+    public ConnectionFactory connectionFactory(@Value("${spring.rabbitmq.queue.name}") String queueName) throws Exception {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
-        channel.queueDeclare(QUEUE_NAME, false, false, false, Collections.emptyMap());
+        channel.queueDeclare(queueName, false, false, false, Collections.emptyMap());
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             try {
+                //imitate of long work
                 Thread.sleep(2000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -37,9 +38,8 @@ public class DemoApplication {
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
             System.out.println(" [x] Received '" + message + "'");
         };
-        channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
+        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
         });
         return factory;
     }
-
 }
