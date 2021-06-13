@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,24 +18,33 @@ import java.util.concurrent.TimeoutException;
 
 @SpringBootApplication
 @RestController
-public class DemoClientApplication {
-
-    @Autowired
-    private ConnectionFactory connectionFactory;
+public class RabbitSender {
 
     @Value("${spring.rabbitmq.queue.name}")
     private String queueName;
 
+    @Autowired
+    private ConnectionFactory factory;
+
     public static void main(String[] args) {
-        SpringApplication.run(DemoClientApplication.class, args);
+        SpringApplication.run(RabbitSender.class, args);
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory(@Value("${spring.rabbitmq.port}") int port,
+                                               @Value("${spring.rabbitmq.host}") String host) {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setPort(port);
+        factory.setHost(host);
+        return factory;
     }
 
     @GetMapping
     public void sendRequest(@RequestParam(required = false) String message) {
-        if (message.isBlank()) {
+        if (message == null || message.isBlank()) {
             message = "User!";
         }
-        try (Connection connection = connectionFactory.newConnection();
+        try (Connection connection = factory.newConnection();
              Channel channel = connection.createChannel()) {
             channel.queueDeclare(queueName, false, false, false, Collections.emptyMap());
             channel.basicPublish("", queueName, null, message.getBytes());
