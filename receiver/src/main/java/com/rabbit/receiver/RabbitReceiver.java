@@ -1,10 +1,9 @@
-package com.rabbit.sender;
+package com.rabbit.receiver;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,15 +15,17 @@ import java.util.Collections;
 @SpringBootApplication
 public class RabbitReceiver {
 
-    @Autowired
-    private ConnectionFactory factory;
-
     public static void main(String[] args) {
         SpringApplication.run(RabbitReceiver.class, args);
     }
 
     @Bean
-    public ConnectionFactory connectionFactory(@Value("${spring.rabbitmq.queue.name}") String queueName) throws Exception {
+    public ConnectionFactory connectionFactory(@Value("${spring.rabbitmq.queue.name}") String queueName,
+                                               @Value("${spring.rabbitmq.port}") int port,
+                                               @Value("${spring.rabbitmq.host}") String host) throws Exception {
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(host);
+        factory.setPort(port);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         channel.queueDeclare(queueName, false, false, false, Collections.emptyMap());
@@ -36,7 +37,7 @@ public class RabbitReceiver {
                 e.printStackTrace();
             }
             String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println(" [x] Received '" + message + "'");
+            System.out.println(" [x][x][x] Hello, " + message + " [x][x][x]");
         };
         channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
         });

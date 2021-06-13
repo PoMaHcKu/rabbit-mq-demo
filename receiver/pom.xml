@@ -3,21 +3,30 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.rabbit</groupId>
-        <artifactId>rabbit-demo</artifactId>
-        <version>1</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.1</version>
+        <relativePath/>
     </parent>
+
+    <properties>
+        <project.version>1</project.version>
+    </properties>
+
+    <groupId>com.rabbit.receiver</groupId>
     <artifactId>receiver</artifactId>
     <version>${project.version}</version>
     <name>receiver</name>
 
     <dependencies>
         <dependency>
-            <groupId>com.rabbit.config</groupId>
-            <artifactId>config</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -25,6 +34,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <finalName>receiver</finalName>
+                </configuration>
             </plugin>
         </plugins>
     </build>
