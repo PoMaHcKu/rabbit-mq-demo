@@ -11,6 +11,7 @@
 
     <properties>
         <project.version>1</project.version>
+        <java.version>11</java.version>
     </properties>
 
     <groupId>com.rabbit.receiver</groupId>
